@@ -26,7 +26,7 @@ COPY --from=build /app/server/target/server.jar ./server.jar
 COPY --from=build /app/webapp/target/webapp.war ./webapp.war
 
 # Expose ports (adjust as needed)
-EXPOSE 8080
+EXPOSE 8080 
 
 # Command to run the server
 CMD ["java", "-jar", "server.jar"]

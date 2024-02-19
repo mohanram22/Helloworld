@@ -6,14 +6,23 @@ on:
 
 jobs:
   deploy:
-    name: Build image and push to Ecr
+    name: Build image and push to ECR
     runs-on: ubuntu-latest
     
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
       with:
-        node-version: '20' # Specify Node.js version 20 for the checkout action
+        node-version: 18
+
+    - name: Install Dependencies
+      run: npm ci
+
+    - name: Run Tests
+      run: npm test 
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
@@ -24,9 +33,9 @@ jobs:
 
     - name: Login to Amazon ECR
       id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+      uses: aws-actions/amazon-ecr-login@v2
 
-    - name: Build, tag, and push image to Amazon_ecr
+    - name: Build, tag, and push image to Amazon ECR
       id: build-image
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -35,4 +44,4 @@ jobs:
       run: |
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+    
